@@ -220,14 +220,21 @@ class AnkiImageCardCreator:
         )
 
         media_files = []
-        for front, back in self.cards:
+        for card in self.cards:
+            front = card.get('front', '')
+            back = card.get('back', '')
+            audio = card.get('audio', '')
+
             front_html = ""
             back_html = ""
 
             if front.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
                 media_files.append(front)
                 front_html += f'<img src="{os.path.basename(front)}">'
-
+            if audio:
+                audio_name = os.path.basename(audio)
+                media_files.append(audio)
+                front_html = f'[sound:{audio_name}]<br>' + front_html
             elif front.lower().endswith(('.mp3', '.wav', '.ogg', '.wma', '.webm', '.mp4', '.m4a', '.flac', '.wma', '.aac')):
                 media_files.append(front)
                 front_html += f'<audio controls src="{os.path.basename(front)}"></audio>'
@@ -235,7 +242,6 @@ class AnkiImageCardCreator:
             if back.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
                 media_files.append(back)
                 back_html += f'<img src="{os.path.basename(back)}">'
-
             elif back.lower().endswith(('.mp3', '.wav', '.ogg', '.wma', '.webm', '.mp4', '.m4a', '.flac', '.wma', '.aac')):
                 media_files.append(back)
                 back_html += f'<audio controls src="{os.path.basename(back)}"></audio>'
@@ -250,8 +256,10 @@ class AnkiImageCardCreator:
         package.media_files = media_files
         package.write_to_file(file_path)
 
-        messagebox.showinfo("Exportado", f"Deck .apkg exportado com sucesso para:
-{file_path}")
+        messagebox.showinfo(
+            "Exportado",
+            f"Deck .apkg exportado com sucesso para: {file_path}"
+        )
 
 if __name__ == "__main__":
     root = tk.Tk()
